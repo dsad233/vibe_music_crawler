@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import * as cheerio from "cheerio";
 import ex from "exceljs";
-import { delay } from "../common/utils.js";
+import { delay, dateFormatting } from "../common/utils.js";
 
 export class VibeController {
   newAlbums = async (req, res) => {
@@ -65,7 +65,7 @@ export class VibeController {
       let newHeight = await page.evaluate("document.body.scrollHeight");
       if (newHeight === lastHeight) {
         while (lastHeight >= yCoord) {
-          // 마지막으로 앨범 이미지 최종 로드
+          // 마지막으로 앨범 이미지 로드
           await page.evaluate(`window.scrollTo(0, ${yCoord})`);
           await delay(2000);
           yCoord += 700;
@@ -113,13 +113,6 @@ export class VibeController {
 
     worksheet.insertRows(1, result);
     await delay(2000);
-    const currentDate = new Date();
-    const currentDayFormat =
-      currentDate.getFullYear() +
-      "-" +
-      (currentDate.getMonth() + 1) +
-      "-" +
-      currentDate.getDate();
 
     res.header("Access-Control-Expose-Headers", "Content-Disposition");
     res.setHeader(
@@ -131,7 +124,7 @@ export class VibeController {
       "attachment; filename=" +
         `vibe_new_albums_${trim}` +
         "_" +
-        `${currentDayFormat}.xlsx`
+        `${dateFormatting()}.xlsx`
     );
 
     await workbook.xlsx.write(res);
@@ -204,13 +197,6 @@ export class VibeController {
 
       worksheet.insertRows(1, result);
       await delay(2000);
-      const currentDate = new Date();
-      const currentDayFormat =
-        currentDate.getFullYear() +
-        "-" +
-        (currentDate.getMonth() + 1) +
-        "-" +
-        currentDate.getDate();
 
       res.header("Access-Control-Expose-Headers", "Content-Disposition");
       res.setHeader(
@@ -222,7 +208,7 @@ export class VibeController {
         "attachment; filename=" +
           `vibe_hot_songs_${trim}100` +
           "_" +
-          `${currentDayFormat}.xlsx`
+          `${dateFormatting()}.xlsx`
       );
 
       await workbook.xlsx.write(res);
@@ -280,13 +266,6 @@ export class VibeController {
 
       worksheet.insertRows(1, result);
       await delay(2000);
-      const currentDate = new Date();
-      const currentDayFormat =
-        currentDate.getFullYear() +
-        "-" +
-        (currentDate.getMonth() + 1) +
-        "-" +
-        currentDate.getDate();
 
       res.header("Access-Control-Expose-Headers", "Content-Disposition");
       res.setHeader(
@@ -298,7 +277,7 @@ export class VibeController {
         "attachment; filename=" +
           `vibe_hot_songs_${trim}100` +
           "_" +
-          `${currentDayFormat}.xlsx`
+          `${dateFormatting()}.xlsx`
       );
 
       await workbook.xlsx.write(res);
@@ -366,13 +345,6 @@ export class VibeController {
 
     worksheet.insertRows(1, result);
     await delay(2000);
-    const currentDate = new Date();
-    const currentDayFormat =
-      currentDate.getFullYear() +
-      "-" +
-      (currentDate.getMonth() + 1) +
-      "-" +
-      currentDate.getDate();
 
     res.header("Access-Control-Expose-Headers", "Content-Disposition");
     res.setHeader(
@@ -384,7 +356,7 @@ export class VibeController {
       "attachment; filename=" +
         "vibe_today_new_songs" +
         "_" +
-        `${currentDayFormat}.xlsx`
+        `${dateFormatting()}.xlsx`
     );
 
     await workbook.xlsx.write(res);
