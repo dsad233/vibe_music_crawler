@@ -27,7 +27,7 @@ export class VibeController {
     await page.setViewport({ width: 1920, height: 1080 });
 
     const workbook = new ex.Workbook();
-    const worksheet = workbook.addWorksheet(`new_albums_${trim}`);
+    const worksheet = workbook.addWorksheet(`vibe_new_albums_${trim}`);
 
     worksheet.columns = [
       { header: "앨범 제목", key: "album_title", width: 30 },
@@ -129,7 +129,7 @@ export class VibeController {
     res.setHeader(
       "Content-Disposition",
       "attachment; filename=" +
-        `new_albums_${trim}` +
+        `vibe_new_albums_${trim}` +
         "_" +
         `${currentDayFormat}.xlsx`
     );
@@ -157,7 +157,7 @@ export class VibeController {
 
     if (trim === "domestic") {
       const workbook = new ex.Workbook();
-      const worksheet = workbook.addWorksheet(`hot_songs_${trim}100`);
+      const worksheet = workbook.addWorksheet(`vibe_hot_songs_${trim}100`);
 
       worksheet.columns = [
         { header: "노래 제목", key: "song_title", width: 30 },
@@ -220,7 +220,7 @@ export class VibeController {
       res.setHeader(
         "Content-Disposition",
         "attachment; filename=" +
-          `hot_songs_${trim}100` +
+          `vibe_hot_songs_${trim}100` +
           "_" +
           `${currentDayFormat}.xlsx`
       );
@@ -234,7 +234,7 @@ export class VibeController {
       console.log("Done.");
     } else if (trim === "oversea") {
       const workbook = new ex.Workbook();
-      const worksheet = workbook.addWorksheet(`hot_songs_${trim}100`);
+      const worksheet = workbook.addWorksheet(`vibe_hot_songs_${trim}100`);
 
       worksheet.columns = [
         { header: "노래 제목", key: "song_title", width: 30 },
@@ -271,7 +271,8 @@ export class VibeController {
               .trim() || "",
           song_artist: $data("td.artist").attr("title").trim() || "",
           song_image:
-            $data("td.thumb > div.inner > img").attr("src").trim() || "",
+            $data("td.thumb > div.inner > img.img_thumb").attr("src").trim() ||
+            "",
         };
 
         result.push(object);
@@ -295,7 +296,7 @@ export class VibeController {
       res.setHeader(
         "Content-Disposition",
         "attachment; filename=" +
-          `hot_songs_${trim}100` +
+          `vibe_hot_songs_${trim}100` +
           "_" +
           `${currentDayFormat}.xlsx`
       );
@@ -308,5 +309,90 @@ export class VibeController {
 
       console.log("Done.");
     }
+  };
+
+  toDaySongs = async (req, res) => {
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
+
+    // 스크린 크기 설정
+    await page.setViewport({ width: 1920, height: 1080 });
+
+    const workbook = new ex.Workbook();
+    const worksheet = workbook.addWorksheet("vibe_today_new_songs");
+
+    worksheet.columns = [
+      { header: "노래 제목", key: "song_title", width: 30 },
+      { header: "노래 아티스트", key: "song_artist", width: 30 },
+      { header: "노래 이미지 링크", key: "song_image", width: 45 },
+    ];
+
+    await page.goto("https://vibe.naver.com/today-new-songs", {
+      waitUntil: "networkidle2",
+    });
+
+    // 로드 실패 방지, 5초간 대기
+    await page.waitForNetworkIdle({ idleTime: 5000 });
+
+    const data = await page.content();
+
+    await page.screenshot({ path: "./screen.png" });
+
+    const $ = cheerio.load(data);
+
+    const result = [];
+    $(
+      "body > div#__nuxt > div#home > div#container > main#content > div.subend_section.home_end > div.track_wrap > div.track_section > div > div.tracklist > table > tbody > tr"
+    ).each((idx, data) => {
+      const $data = cheerio.load(data);
+
+      delay(1000);
+      const object = {
+        song_title:
+          $data(
+            "td.song > div.title_badge_wrap > span.inner_cell > a.link_text"
+          )
+            .attr("title")
+            .trim() || "",
+        song_artist:
+          $data("td.song > div.artist_sub").attr("title").trim() || "",
+        song_image:
+          $data("td.thumb > div.inner > img.img_thumb").attr("src").trim() ||
+          "",
+      };
+
+      result.push(object);
+    });
+
+    worksheet.insertRows(1, result);
+    await delay(2000);
+    const currentDate = new Date();
+    const currentDayFormat =
+      currentDate.getFullYear() +
+      "-" +
+      (currentDate.getMonth() + 1) +
+      "-" +
+      currentDate.getDate();
+
+    res.header("Access-Control-Expose-Headers", "Content-Disposition");
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=" +
+        "vibe_today_new_songs" +
+        "_" +
+        `${currentDayFormat}.xlsx`
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+
+    await page.close();
+    await browser.close();
+
+    console.log("Done.");
   };
 }

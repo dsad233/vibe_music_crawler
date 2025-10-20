@@ -12,4 +12,7 @@ router.get("/albums/new/excel", asyncWrapper(vibeController.newAlbums));
 // 노래 급상승
 router.get("/songs/hot/excel", asyncWrapper(vibeController.hotSongs));
 
+// 주목할 최신곡
+router.get("/songs/new/excel", asyncWrapper(vibeController.toDaySongs));
+
 export default router;
