@@ -8,10 +8,10 @@ const port = 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use((err, res, req, next) => {
+app.use("/vibe", VibeRouter);
+app.use((err, req, res, next) => {
   errorHandler(err, res, res, next);
 });
-app.use("/vibe", VibeRouter);
 
 app.listen(port, () => {
   console.log(port, " listening...");
