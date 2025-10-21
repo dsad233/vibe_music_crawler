@@ -17,16 +17,10 @@
 
 ### Install
 
-- npm
+- npm or yarn
 
   ```
-  npm install
-  ```
-
-- yarn
-
-  ```
-  yarn install
+  npm install or yarn install
   ```
 
 <br/>
@@ -73,6 +67,6 @@ http://localhost:3000/vibe/songs/hot/excel?filter=oversea
 * 주목할 최신곡
 */
 
-http://localhost:3000/vibe/songs/hot/excel
+http://localhost:3000/vibe/songs/new/excel
 
 ```
