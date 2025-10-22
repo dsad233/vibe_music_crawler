@@ -1,6 +1,6 @@
 import express from "express";
 import VibeRouter from "./src/vibe/vibe.router.js";
-import { errorHandler } from "./src/common/middlewares/error.middlewares.js";
+import { errorHandler } from "./src/common/middlewares/error.middleware.js";
 
 const app = express();
 const port = 3000;
