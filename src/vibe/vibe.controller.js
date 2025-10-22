@@ -7,9 +7,12 @@ export class VibeController {
   newAlbums = async (req, res) => {
     const { filter } = req.query;
 
-    const trim = ["domestic", "oversea", "manual"].includes(filter)
-      ? filter.trim()
-      : "manual";
+    const trim = filter ? filter.toLowerCase().trim() : "manual";
+
+    if (!["domestic", "oversea", "manual"].includes(trim)) {
+      return res.status(400).json({ message: "Invalid query" });
+    }
+
     let gotoUrl = "";
 
     if (trim === "domestic") {
@@ -138,9 +141,12 @@ export class VibeController {
 
   hotSongs = async (req, res) => {
     const { filter } = req.query;
-    const trim = ["domestic", "oversea"].includes(filter)
-      ? filter.trim()
-      : "domestic";
+
+    const trim = filter ? filter.toLowerCase().trim() : "domestic";
+
+    if (!["domestic", "oversea"].includes(trim)) {
+      return res.status(400).json({ message: "Invalid query" });
+    }
 
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -148,8 +154,9 @@ export class VibeController {
     // 스크린 크기 설정
     await page.setViewport({ width: 1920, height: 1080 });
 
+    const workbook = new ex.Workbook();
+
     if (trim === "domestic") {
-      const workbook = new ex.Workbook();
       const worksheet = workbook.addWorksheet(`vibe_hot_songs_${trim}100`);
 
       worksheet.columns = [
@@ -219,7 +226,6 @@ export class VibeController {
 
       console.log("Done.");
     } else if (trim === "oversea") {
-      const workbook = new ex.Workbook();
       const worksheet = workbook.addWorksheet(`vibe_hot_songs_${trim}100`);
 
       worksheet.columns = [
